@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-init-users-config
+data:
+  create-users.sql: |
+    CREATE ROLE aimpsql WITH LOGIN SUPERUSER PASSWORD 'fusionisthebest';
+    GRANT ALL ON DATABASE "PatientServerDB" TO aimpsql;
+    CREATE ROLE deploy WITH LOGIN SUPERUSER PASSWORD 'fusionisthebest';
+    GRANT ALL ON DATABASE "PatientServerDB" TO deploy;
+    CREATE ROLE vault_user WITH LOGIN SUPERUSER PASSWORD 'fusionisthebest';
+    GRANT ALL ON DATABASE "PatientServerDB" TO vault_user;
