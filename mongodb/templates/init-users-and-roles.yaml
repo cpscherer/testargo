@@ -1,0 +1,224 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: init-users-and-roles-config
+data:
+  init-users-and-roles.js: |
+    /*
+     * This script should run on both new and existing installations. So, this script should bring
+     * the mongodb user and role configurations to the proper state.
+     */
+
+    /*-------- HELPER FUNCTIONS --------*/
+    var createOrUpdateRole = function(role) {
+        if(!db.getRole(role.role)) {
+            db.createRole(role);
+        } else {
+            var rolename = role.role;
+            delete role.role;
+            db.updateRole(rolename, role);
+        }
+    };
+
+    var createOrUpdateUser = function(user) {
+        if (!db.getUser(user.user)) {
+            db.createUser(user);
+        } else {
+            var username = user.user;
+            delete user.user;
+            delete user.pwd; //Don't update password
+            db.updateUser(username, user);
+        }
+    };
+
+    /*-------- ROLES --------*/
+    createOrUpdateRole({
+        role: "changeOwnPasswordCustomDataRole",
+        privileges: [{
+            resource: { db: "", collection: "" },
+            actions: ["changeOwnPassword", "changeOwnCustomData"]
+        }],
+        roles: []
+    });
+
+    //Role needed to execute JS on the mongo server. This feature is needed by Mongeez.
+    createOrUpdateRole({
+        role: "mongeezJSEval",
+        privileges: [
+            {resource: { anyResource: true }, actions: ["anyAction"] }
+        ],
+        roles: []
+    });
+
+    //Role used by koeo apps that can't obtain mongo credentials from vault (e.g. patient-server). This role has access limited to
+    //only the resources needed.
+    createOrUpdateRole({
+        role: "legacyAppRole",
+        privileges: [
+            { resource: { db: "koeoLog", collection: "" }, actions: ["find", "insert"] },
+            { resource: { db: "security", collection: "authSessions" }, actions: ["find", "insert", "update", "remove"] },
+            { resource: { db: "security", collection: "archivedSessions" }, actions: ["find", "insert", "update", "remove"] }
+        ],
+        roles:[]
+    });
+
+    /*-------- USERS --------*/
+    createOrUpdateUser({
+        user: "{{ .Values.mongodb.mongoAdminUser }}",
+        pwd: "{{ .Values.mongodb.mongoAdminPassword }}",
+        roles: [
+            { role: "userAdminAnyDatabase", db: "admin" },
+            { role: "restore", db: "admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "{{ .Values.mongodb.mongoLegacyUser }}",
+        pwd: "{{ .Values.mongodb.mongoLegacyPassword }}",
+        roles: ["legacyAppRole"]
+    });
+
+    createOrUpdateUser({
+        user: "{{ .Values.mongodb.mongoDeployUser }}",
+        pwd: "{{ .Values.mongodb.mongoDeployPassword }}",
+        roles: [
+            { role: "dbAdminAnyDatabase", db: "admin" },
+            { role: "userAdminAnyDatabase", db: "admin" },
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role: "mongeezJSEval", db: "admin" },
+            { role: "restore", db: "admin" },
+            { role: "changeOwnPasswordCustomDataRole", db: "admin" }
+        ] 
+    });
+
+    createOrUpdateUser({
+        user: "{{ .Values.mongodb.mongoVaultUser }}",
+        pwd: "{{ .Values.mongodb.mongoVaultInitialPassword }}",
+        roles: ["root"]
+    });
+
+    createOrUpdateUser({
+        user: "poconnor",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "cscherer",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "cgray",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "arnarb",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "hs",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "khauser",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "rscherer",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "jcoleman",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "jowens",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "lwaggoner",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "mhavens",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "jtran",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "sjohnsen",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });
+
+    createOrUpdateUser({
+        user: "sreese",
+        pwd: "qwe123",
+        roles: [
+            { role: "readWriteAnyDatabase", db: "admin" },
+            { role:"changeOwnPasswordCustomDataRole", db:"admin" }
+        ]
+    });

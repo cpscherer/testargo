@@ -1,0 +1,9 @@
+mongodb:
+  mongoDeployUser: deploy
+  mongoDeployPassword: fusionisthebest
+  mongoAdminUser: admin
+  mongoAdminPassword: fusionisthebest
+  mongoLegacyUser: koeoLegacyUser
+  mongoLegacyPassword: fusionisthebest
+  mongoVaultUser: vault_admin
+  mongoVaultInitialPassword: fusionisthebest
