@@ -40,9 +40,6 @@ spec:
             - name: user-role-config
               mountPath: /docker-entrypoint-initdb.d/init-users-and-roles.js
               subPath: init-users-and-roles.js
-      nodeSelector:
-        kubernetes.io/os: linux
-        kubernetes.io/arch: amd64
       volumes:
         - name: user-role-config
           configMap:
